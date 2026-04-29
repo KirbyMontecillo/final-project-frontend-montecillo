@@ -1,27 +1,168 @@
-# Angular21Boilerplate
+Angular 21 Auth Boilerplate (Beginner Guide)
+This project is a beginner-friendly Angular 21 boilerplate that demonstrates a complete authentication flow:
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Email sign up + email verification
 
-## Development server
+Login + logout
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+JWT auth header for API requests
 
-## Code scaffolding
+Refresh tokens (cookie-based) + auto-refresh before access token expiry
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Forgot password + reset password
 
-## Build
+Role-based authorization (User & Admin)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Admin area for account management
 
-## Running unit tests
+Profile area for viewing/updating your own account
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Table of Contents
+Prerequisites
 
-## Running end-to-end tests
+Run the App (Real API)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Run the App (Fake Backend, No API)
 
-## Further help
+Using the App (What to Click)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+How Authentication Works
+
+Authorization (Roles + Route Guards)
+
+Project Structure (Quick Tour)
+
+Troubleshooting
+
+## 1) Prerequisites
+Node.js (LTS recommended)
+
+npm (comes with Node.js)
+
+(Optional) Angular CLI: npm i -g @angular/cli
+
+## 2) Run the App (Real API)
+By default, this project is set up to call a real API at http://localhost:4000 (see src/environments/environment.ts).
+
+### Step 1: Install Packages
+From the project root (where package.json is):
+
+Bash
+npm install
+### Step 2: Start Your Backend API
+Start an API that implements the /accounts/* endpoints described in the How Authentication Works section. The frontend expects the API to be available at http://localhost:4000 by default.
+
+### Step 3: Start Angular
+Bash
+npm start
+This runs ng serve --open and should open the app in your browser.
+
+### Step 4: Update API URL (If Your API Runs Elsewhere)
+Edit the environment file:
+
+src/environments/environment.ts (development)
+
+src/environments/environment.prod.ts (production build)
+
+Update the apiUrl:
+
+TypeScript
+apiUrl: 'http://localhost:4000'
+## 3) Run the App (Fake Backend, No API)
+If you want to run everything fully in the browser (no backend), you can enable the built-in fake backend interceptor.
+
+### Step 1: Enable the Fake Backend Provider
+Open src/app/app.module.ts and uncomment the fakeBackendProvider line in the providers array:
+
+TypeScript
+providers: [
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
+    // provider used to create fake backend
+    fakeBackendProvider
+],
+### Step 2: Run the App
+Bash
+npm install
+npm start
+### How the Fake Backend Behaves
+Storage: Accounts are stored in your browser localStorage, not in a database.
+
+Emails: Verification and reset password links are displayed in the UI as alerts since a browser-only app cannot send real emails.
+
+Roles: The first registered account becomes an Admin, and all subsequent accounts become User.
+
+Note: To reset the fake backend, clear site data in your browser or delete the key: angular-15-signup-verification-boilerplate-accounts.
+
+## 4) Using the App (What to Click)
+### A) Create an Account
+Go to Register.
+
+Fill in your details and submit.
+
+If using the fake backend, a "verification email" will appear as an alert with a link.
+
+Click the link (or paste it into the browser) to verify.
+
+### B) Login
+Go to Login.
+
+Enter your credentials.
+
+On success, you will be redirected to the Home page.
+
+## 5) How Authentication Works
+This boilerplate uses two tokens:
+
+Access Token (JWT): A short-lived token used in the Authorization: Bearer <token> header.
+
+Refresh Token: A long-lived token stored in a secure cookie and sent with withCredentials: true.
+
+### Flow: Login
+LoginComponent calls AccountService.login().
+
+The API returns an Account object including the jwtToken.
+
+The app stores the account in memory (BehaviorSubject) and starts a refresh timer.
+
+For future requests, the JWT Interceptor attaches the token.
+
+### Flow: Refresh Token
+The refresh token is sent to the API using cookies.
+
+The API responds with a new access token.
+
+The app auto-refreshes about 1 minute before the access token expires.
+
+On page reload, APP_INITIALIZER calls refresh to restore the session.
+
+## 6) Authorization (Roles + Route Guards)
+Routes are protected with AuthGuard:
+
+Not logged in: Redirected to /account/login.
+
+Wrong role: Redirected to /.
+
+Example: The /admin path requires Role.Admin.
+
+## 7) Project Structure (Quick Tour)
+_services/: Shared services (Account, Alert).
+
+_helpers/: Guards, interceptors, and the fake backend.
+
+_models/: Shared types (Account, Role).
+
+account/: Auth screens (Login, Register, Verify).
+
+profile/: User-specific screens.
+
+admin/: Management screens.
+
+## 8) Troubleshooting
+Redirected back to Login: Ensure your real API supports POST /accounts/refresh-token and sets the cookie.
+
+CORS Errors: When calling an API on another port, ensure the backend returns Access-Control-Allow-Credentials: true and specifically allows your frontend origin.
+
+Unit Tests: Run npm test.
