@@ -57,7 +57,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function authenticate() {
             const { email, password } = body;
-            const account = accounts.find(x => x.email === email && x.password === password && x.isVerified);
+            const account = accounts.find(x => x.email === email && x.password === password);
 
             if (!account) return error('Email or password is incorrect');
 
@@ -133,7 +133,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
             account.dateCreated = new Date().toISOString();
             account.verificationToken = new Date().getTime().toString();
-            account.isVerified = false;
+            account.isVerified = true;
             account.refreshTokens = [];
             delete account.confirmPassword;
             accounts.push(account);
@@ -376,6 +376,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             // get refresh token from cookie
             return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
         }
+    }
+
+}
 
 export let fakeBackendProvider = {
     // use fake backend in place of Http service for backend-less development
@@ -383,3 +386,4 @@ export let fakeBackendProvider = {
     useClass: FakeBackendInterceptor,
     multi: true
 };
+
