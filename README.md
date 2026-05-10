@@ -1,5 +1,26 @@
-Angular 21 Auth Boilerplate (Beginner Guide)
-This project is a beginner-friendly Angular 21 boilerplate that demonstrates a complete authentication flow:
+# Final Project: Full-Stack Authentication System
+
+## Live Application URL
+[ INSERT YOUR FRONTEND URL HERE ]
+
+---
+
+## Final Examination Requirements
+
+### Stage A: Functional Testing (Fake Backend)
+- Status: Integrated
+- Implementation: Enable fakeBackendProvider in app.module.ts.
+- Objective: Demonstrate application logic and UI functionality without external dependencies.
+
+### Stage B: Integration Testing (Remote Backend)
+- Status: Integrated
+- Implementation: Disable fakeBackendProvider and configure environment.prod.ts to point to the live API.
+- Objective: Demonstrate end-to-end integration with the Node.js API and MySQL database.
+
+---
+
+## Features Overview
+This project provides a comprehensive authentication flow using Angular 21:
 
 Email sign up + email verification
 
